@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fancade - Palette</title>
+</head>
+
+<body>
+   
+<style>
+   
+   @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@800');
+   
+   * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Baloo 2';
+      color: #fff;
+      user-select: none;
+      
+   }
+   body {
+      background: #00c0ff;
+   }
+   .palette {
+      overflow: hidden;
+      background: #fff;
+      transform-style: preserve-3d;
+   }
+   .col {
+      display: inline-block;
+      transform: translateZ(5px);
+   }
+   .rgb , .hex {
+      background: #fff;
+      color: #adbdd1;
+      width: calc(50% - 1.6px);
+      height: 22.5%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transform: translateZ(-5px);
+   }
+   .rgb:active,.hex:active {
+      transform: translateY(5px);
+   }
+   .selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: #00c0ff;
+   }
+   .selected {
+      box-shadow: inset 0px 7px 5px #0005;
+   }
+   .checked {
+      color: #fff;
+      background: #00c0ff;
+      box-shadow: 0 -5px #0088fe;
+   }
+   
+   @media (orientation: portrait) {
+      .palette {
+         position: absolute;
+         top: calc(((100vh - 24vw) * 0.5) - 9vw);
+         left: calc((100vw - 88vw) * 0.5);
+         border-radius: 3vw;
+         box-shadow:0 0 0 0.5vh black, 0 0 0 1vh white;
+         width: calc(8vw * 11);
+         height: calc(8vw * 5.5);
+      }
+      .col {
+         width: 8vw;
+         height: 8vw;
+      }
+      .selector {
+         width: calc(8vw * 11);
+         height: 8.5vw;
+         border-radius: 0 0 3vw 3vw;
+         box-shadow: 0 3vw #0088fe;
+      }
+      .rgb {
+         border-radius: 0 3vw 0 0;
+      }
+      .hex {
+         border-radius: 3vw 0 0 0;
+      }
+   }
+   
+   @media (orientation: landscape) {
+      .palette {
+         position: absolute;
+         top: calc(((100vh - 30vh) * 0.5) - 12vh);
+         left: calc((100vw - 110vh) * 0.5);
+         border-radius: 3vh;
+         box-shadow:0 0 0 0.5vw black, 0 0 0 1vw white;
+         width: calc(10vh * 11);
+         height: calc(10vh * 5.5);
+      }
+      .col {
+         width: 10vh;
+         height: 10vh;
+      }
+      .selector {
+         width: calc(10vh*11);
+         height: 11vh;
+         border-radius: 0 0 4vh 4vh;
+         box-shadow: 0 3vh #0088fe;
+      }
+      .rgb {
+         border-radius: 0 3vh 0 0;
+      }
+      .hex {
+         border-radius: 3vh 0 0 0;
+      }
+   }
+   
+</style>
+
+<div class="palette">
+   <div class="type1 hex checked" onclick="type(1)">HEX</div>
+   <div class="type2 rgb" onclick="type(2)">RGB</div>
+   <br>
+</div>
+
+<script>
+   
+   var colors = [
+      'rgb(219,145,145)',//1
+      'rgb(255,227,227)',//1
+      'rgb(171,134,255)',//1
+      'rgb(255,179,228)',//1
+      'rgb(255,150,150)',//1
+      'rgb(255,163,125)',//1
+      'rgb(255,255,117)',//1
+      'rgb(171,255,104)',//1
+      'rgb(0,194,255)',//1
+      'rgb(254,255,255)',//1
+      'rgb(91,91,118)',//1
+      'rgb(187,103,122)',//2
+      'rgb(255,202,184)',//2
+      'rgb(137,107,214)',//2
+      'rgb(255,144,202)',//2
+      'rgb(255,72,101)',//2
+      'rgb(255,108,80)',//2
+      'rgb(255,205,0)',//2
+      'rgb(62,186,73)',//2
+      'rgb(0,140,255)',//2
+      'rgb(221,224,240)',//2
+      'rgb(60,60,80)',//2
+      'rgb(144,79,90)',//3
+      'rgb(245,171,160)',//3
+      'rgb(102,81,158)',//3
+      'rgb(230,108,167)',//3
+      'rgb(187,52,77)',//3
+      'rgb(200,77,61)',//3
+      'rgb(233,163,0)',//3
+      'rgb(0,134,74)',//3
+      'rgb(0,106,212)',//3
+      'rgb(135,139,160)',//3
+      'rgb(26,26,37)'//3
+   ];
+   
+   let hex = true;
+   
+   function type(x) {
+      var type = x;
+      var check = document.querySelector('.'+'type'+x);
+      if (type == 1) {
+         var uncheck = document.querySelector('.'+'type'+(x+1));
+         hex = true
+      }
+      if (type == 2) {
+         var uncheck = document.querySelector('.'+'type'+(x-1));
+         hex = false
+      }
+      check.classList.add('checked');
+      check.style.boxShadow = '0 -5px #0088fe'
+      uncheck.classList.remove('checked');
+      uncheck.style.boxShadow = '0 -5px #adbdd155'
+      if (document.querySelector('.selector').innerHTML == 'Select a Color To Display') {}
+      else {
+         if (hex == true) {
+            document.querySelector('.selector').innerHTML = eval(colors[selcol]);
+         }
+         if (hex == false) {
+            document.querySelector('.selector').innerHTML = colors[selcol];
+         }
+      }
+   }
+   
+   function select(x) {
+      if (hex == true) {
+         document.querySelector('.selector').innerHTML = eval(colors[x]);
+      }
+      if (hex == false) {
+         document.querySelector('.selector').innerHTML = colors[x];
+      }
+      for (c = 0; c < 33; ++c) {
+         
+         var col = document.querySelector(".cols" + c);
+         
+         if (x == c) {
+            selcol = x
+            document.body.style.background = colors[x];
+            col.classList.add('selected');
+              
+            if (hex == true) {
+               copy(eval(colors[x]));
+            }
+            if (hex == false) {
+               copy(colors[x]);
+            }
+         }
+         else {
+            col.classList.remove('selected');
+         }
+      }
+   }
+   
+   var palette = document.querySelector('.palette');
+   
+   for (i = 0; i < 33; ++i) {
+      palette.innerHTML = palette.innerHTML + '<div class="col cols' + i + '" onclick="select(' + i + ')">‌</div>'
+      document.querySelector(('.cols' + i)).style.background = colors[i];
+   }
+   
+   palette.innerHTML = palette.innerHTML + '<div class="selector"></div>';
+   
+   document.querySelector('.selector').innerHTML = 'Select a Color To Display';
+   
+   function rgb(r, g, b) {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+   }
+   
+   function copy(text) {
+      var dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = text;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+   }
+   
+</script>
+
+</body>
+
+</html>
