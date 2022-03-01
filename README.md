@@ -1,5 +1,5 @@
 # ColorPicker
-Fancade ColorPicker
+![preview](preview.png)
 > with 2 different type 
 > * HEX
 > * RGB
