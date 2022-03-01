@@ -1,7 +1,6 @@
 # ColorPicker
 Fancade ColorPicker
-
-with 2 different type 
+> with 2 different type 
 > * HEX
 > * RGB
 
