@@ -6,7 +6,7 @@
 > * RGB
 
 Created With Javascript
-#Palette Exporter
+# Palette Exporter
 > Can export palette in 4 type 
 > * .Pal
 > * .Hex
