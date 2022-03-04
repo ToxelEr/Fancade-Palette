@@ -12,3 +12,8 @@ Created With Javascript
 > * .Hex
 > * .Gpl
 > * .Txt
+# Whats New
+- Added Button Sounds
+- Added Palette Export
+- Added Ui Border
+- Fixed Ui
