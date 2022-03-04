@@ -19,19 +19,91 @@
       font-family: 'Baloo 2';
       color: #fff;
       user-select: none;
-      
    }
-   body {
+   h1 {
+      font-family: 'Baloo 2';
+   }
+   body,html {
       background: #00c0ff;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+   }
+   .exports {
+      position: absolute;
+      left: 25%;
+      width: 50%;
+      height: calc(15% * 4);
+      box-shadow:0 0 0 0.20em black, 0 0 0 0.35em white ,inset 0 5px #adbdd1;
+      border-radius: 2vmin;
+   }
+   .click {
+      background: #fff;
+      color: #adbdd1;
+      border: 0;
+      width: 100%;
+      height: calc(25% - (5px / 4));
+      box-shadow: 0px 5px #adbdd1 , inset 0 0 0 1px #adbdd155;
+      transform-style: preserve-3d;
+      transform: translateZ(5px);
+   }
+   .click:nth-child(1) {
+      border-radius: 2vmin 2vmin 0 0;
+   }
+   .click:nth-child(4) {
+      border-radius: 0 0 2vmin 2vmin;
+   }
+   .click:active {
+      transform: translateZ(-5px) translateY(5px);
+      box-shadow: 0px 0px #adbdd1 , inset 0 0 0 1px #adbdd155;
+   }
+   .export {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      transform: scale(0);
+      transition: all 0.2s ease-in-out;
+      text-align: center;
+   }
+   .overlay {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      bottom: 0;
+      transform: translateZ(5px);
+   }
+   .icon {
+      width: 20px;
+      height: 20px;
+      background-image: url(atlas.png);
+      background-size: 400%;
+      background-repeat: no-repeat;
+   }
+   .center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+   }
+   .centered {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80%;
+      width: 100%;
    }
    .palette {
       overflow: hidden;
       background: #fff;
-      transform-style: preserve-3d;
    }
    .col {
-      display: inline-block;
+      display: inline-flex;
       transform: translateZ(5px);
+      font-size: 0;
+      box-shadow:inset 0 0 0 1px #0021;
    }
    .rgb , .hex {
       background: #fff;
@@ -52,21 +124,35 @@
       align-items: center;
       text-align: center;
       background: #00c0ff;
+      font-size: initial;
    }
    .selected {
-      box-shadow: inset 0px 7px 5px #0005;
+      box-shadow: inset 0px 7px 5px #0025;
    }
    .checked {
       color: #fff;
       background: #00c0ff;
-      box-shadow: 0 -5px #0088fe;
+      box-shadow: 0 -5px #00c0ff , 0 -10px #0088fe;
+   }
+   .button {
+      border-radius: 10px;
+      padding: 10px 15px;
+      background: #00c0ff;
+      border: 0;
+      border-bottom: #0088fe solid 5px;
+      box-shadow:0 0 0 0.20em black, 0 0 0 0.35em white;
+      margin: 5%;
+   }
+   .button:active {
+      border-bottom: #0088fe solid 0px;
+      border-top: #0088fe solid 5px;
+   }
+   .colors {
+      font-size: 0;
    }
    
    @media (orientation: portrait) {
       .palette {
-         position: absolute;
-         top: calc(((100vh - 24vw) * 0.5) - 9vw);
-         left: calc((100vw - 88vw) * 0.5);
          border-radius: 3vw;
          box-shadow:0 0 0 0.5vh black, 0 0 0 1vh white;
          width: calc(8vw * 11);
@@ -92,9 +178,6 @@
    
    @media (orientation: landscape) {
       .palette {
-         position: absolute;
-         top: calc(((100vh - 30vh) * 0.5) - 12vh);
-         left: calc((100vw - 110vh) * 0.5);
          border-radius: 3vh;
          box-shadow:0 0 0 0.5vw black, 0 0 0 1vw white;
          width: calc(10vh * 11);
@@ -120,11 +203,16 @@
    
 </style>
 
-<div class="palette">
-   <div class="type1 hex checked" onclick="type(1)">HEX</div>
-   <div class="type2 rgb" onclick="type(2)">RGB</div>
-   <br>
+<div class="gen">
 </div>
+
+<center class="center">
+   <div class="palette">
+      <div class="type1 hex checked" onclick="type(1)">HEX</div>
+      <div class="type2 rgb" onclick="type(2)">RGB</div>
+      <div class="colors"></div>
+   </div>
+</center>
 
 <script>
    
@@ -167,6 +255,7 @@
    let hex = true;
    
    function type(x) {
+      sound('uibutton.wav',1)
       var type = x;
       var check = document.querySelector('.'+'type'+x);
       if (type == 1) {
@@ -184,7 +273,7 @@
       if (document.querySelector('.selector').innerHTML == 'Select a Color To Display') {}
       else {
          if (hex == true) {
-            document.querySelector('.selector').innerHTML = eval(colors[selcol]);
+            document.querySelector('.selector').innerHTML = '#'+eval('hex'+colors[selcol]);
          }
          if (hex == false) {
             document.querySelector('.selector').innerHTML = colors[selcol];
@@ -193,8 +282,9 @@
    }
    
    function select(x) {
+      sound('beep.wav',1)
       if (hex == true) {
-         document.querySelector('.selector').innerHTML = eval(colors[x]);
+         document.querySelector('.selector').innerHTML = '#'+eval('hex'+colors[x]);
       }
       if (hex == false) {
          document.querySelector('.selector').innerHTML = colors[x];
@@ -209,7 +299,7 @@
             col.classList.add('selected');
               
             if (hex == true) {
-               copy(eval(colors[x]));
+               copy('#'+eval('hex'+colors[x]));
             }
             if (hex == false) {
                copy(colors[x]);
@@ -221,10 +311,10 @@
       }
    }
    
-   var palette = document.querySelector('.palette');
+   var palette = document.querySelector('.colors');
    
    for (i = 0; i < 33; ++i) {
-      palette.innerHTML = palette.innerHTML + '<div class="col cols' + i + '" onclick="select(' + i + ')">‌</div>'
+      palette.innerHTML = palette.innerHTML + '<color class="col cols' + i + '" onclick="select(' + i + ')"></color>'
       document.querySelector(('.cols' + i)).style.background = colors[i];
    }
    
@@ -232,20 +322,80 @@
    
    document.querySelector('.selector').innerHTML = 'Select a Color To Display';
    
-   function rgb(r, g, b) {
-      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+   function hexrgb(r, g, b) {
+      return (((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1));
    }
    
    function copy(text) {
-      var dummy = document.createElement("textarea");
-      document.body.appendChild(dummy);
-      dummy.value = text;
-      dummy.select();
+      var textarea = document.createElement("textarea");
+      document.body.appendChild(textarea);
+      textarea.value = text;
+      textarea.select();
       document.execCommand("copy");
-      document.body.removeChild(dummy);
+      document.body.removeChild(textarea);
    }
    
+   function save(text,name) {
+      var a = document.createElement('a');
+      a.href = 'data:attachment/text,' + encodeURI(text);
+      a.target = '_blank';
+      a.download = name;
+      sound('beep.wav',1);
+      a.click();
+   }
+   
+   function spacergb(r, g, b) {
+      return r + ' ' + g + ' ' + b + '' ;
+   }
+   
+   let palpal = 'JASC-PAL\n0100\n33';
+   let palhex = ' ';
+   let palgpl = 'GIMP Palette\nName: Fancade\nColumns: 33'
+   let paltxt = ';paint.net Palette File\n;Downloaded from fancade-colorpicker\n;Palette Name: Fancade\n;Description: Fancade Palette\n;Colors: 33';
+   
+   for (let x = 0; x < 11; x++) {
+      for (let y = 0; y < 3; y++) {
+         var cn = y*11 + x;
+         palpal = palpal + '\n' + eval('space'+colors[cn]);
+         palhex = palhex + '\n' + eval('hex'+colors[cn]);
+         palgpl = palgpl + '\n' + eval('space'+colors[cn]) + ' ' + eval('hex'+colors[cn]);
+         paltxt = paltxt + '\nFF' + eval('hex'+colors[cn]);
+      }
+   }
+   
+   function sound(x,y) {
+      var audio = new Audio(x);
+      audio.volume = y;
+      audio.play();
+   }
+   
+   let showed = false;
+   
+   function show() {
+      display = document.querySelector('.export');
+      if (showed == true) {
+         display.style.transform = 'scale(0)';
+      }
+      if (showed == false) {
+         display.style.transform = 'scale(1)';
+      }
+      showed = !showed;
+      sound('uibutton.wav',1)
+   }
 </script>
+
+<div class="export">
+   <h1 style="transform: translateY(40%) translateX(0.5%);">Download</h1>
+   <div class="centered">
+      <div class="exports">
+         <button class="click" onclick="save(palpal,'Fancade.pal');">.pal</button>
+         <button class="click" onclick="save(palhex,'Fancade.hex');">.hex</button>
+         <button class="click" onclick="save(palgpl,'Fancade.gpl');">.gpl</button>
+         <button class="click" onclick="save(paltxt,'Fancade.txt');">.txt</button>
+      </div>
+   </div>
+</div>
+<button class="overlay button" onclick="show()"><div class="icon"></div></button>
 
 </body>
 
