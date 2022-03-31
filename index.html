@@ -13,6 +13,11 @@
    
    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@800');
    
+   @font-face {
+      font-family: 'Baloo 2';
+      src: url('./baloo.woff');
+   }
+
    * {
       margin: 0;
       padding: 0;
@@ -30,6 +35,23 @@
       height: 100%;
       transform-style: preserve-3d;
    }
+   body {
+     animation: normal load 0.5s ease;
+     transition: all 0.5s ease;
+   }
+   @keyframes load {
+     0% {
+       transform: rotateX(-90deg) rotateY(90deg) scale(0);
+       opacity: 0;
+     }
+     50% {
+       opacity: 0.25;
+     }
+     100% {
+       transform: rotateX(0deg) rotateY(0deg) scale(1);
+       opacity: 1;
+     }
+   }
    .exports {
       position: absolute;
       left: 25%;
@@ -37,6 +59,7 @@
       height: calc(15% * 4);
       box-shadow:0 0 0 0.20em black, 0 0 0 0.35em white ,inset 0 5px #adbdd1;
       border-radius: 2vmin;
+      overflow: hidden;
    }
    .click {
       background: #fff;
@@ -47,6 +70,7 @@
       box-shadow: 0px 5px #adbdd1 , inset 0 0 0 1px #adbdd155;
       transform-style: preserve-3d;
       transform: translateZ(5px);
+      overflow: hidden;
    }
    .click:nth-child(1) {
       border-radius: 2vmin 2vmin 0 0;
@@ -66,6 +90,7 @@
       transform: scale(0);
       transition: all 0.2s ease-in-out;
       text-align: center;
+      overflow: hidden;
    }
    .overlay {
       position: absolute;
@@ -77,7 +102,7 @@
    .icon {
       width: 20px;
       height: 20px;
-      background-image: url(atlas.png);
+      background-image: url(./atlas.png);
       background-size: 400%;
       background-repeat: no-repeat;
    }
@@ -87,13 +112,15 @@
       justify-content: center;
       width: 100%;
       height: 100%;
+      transition: all 0.25s ease;
    }
    .centered {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 80%;
+      height: 100%;
       width: 100%;
+      transform: translateY(-10vh);
    }
    .palette {
       overflow: hidden;
@@ -203,10 +230,7 @@
    
 </style>
 
-<div class="gen">
-</div>
-
-<center class="center">
+<center id="paldiv" class="center">
    <div class="palette">
       <div class="type1 hex checked" onclick="type(1)">HEX</div>
       <div class="type2 rgb" onclick="type(2)">RGB</div>
@@ -253,6 +277,8 @@
    ];
    
    let hex = true;
+   document.querySelector(".rgb").style.boxShadow = "0 -5px #adbdd155";
+   document.querySelector(".hex").style.boxShadow = "0 -5px #0088fe";
    
    function type(x) {
       sound('uibutton.wav',1)
@@ -370,14 +396,21 @@
    }
    
    let showed = false;
+   paldiv = document.querySelector('#paldiv');
    
    function show() {
       display = document.querySelector('.export');
       if (showed == true) {
          display.style.transform = 'scale(0)';
+         display.style.opacity = '0';
+         paldiv.style.opacity = '1';
+         document.body.style.background = '#0088fe00';
       }
       if (showed == false) {
          display.style.transform = 'scale(1)';
+         display.style.opacity = '1';
+         paldiv.style.opacity = '0'
+         document.body.style.background = '#0088fe88';
       }
       showed = !showed;
       sound('uibutton.wav',1)
