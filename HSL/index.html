@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+
+<style>
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html,body {
+  width: 100%;
+  height: 100%;
+  background: rgb(26,26,37);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  justify-self: center;
+}
+
+.screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  justify-self: center;
+}
+
+#canvas {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+  background: #000;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+@media (orientation: portrait) {
+  #canvas {
+    position: absolute;
+    width: 100vw;
+    height: 100vw;
+    top: calc(50% - 50vw);
+  }
+}
+
+@media (orientation: landscape) {
+  #canvas {
+    height: 100%;
+  }
+  .screen {
+    width: 100vw;
+    height: 80vh;
+  }
+}
+
+</style>
+<div class="screen">
+  <canvas id="canvas"></canvas>
+</div>
+<script>
+
+var canvas = document.querySelector('#canvas');
+var ctx = canvas.getContext('2d');
+
+let palette=[];
+
+var colors = [
+  'rgb(219,145,145)',//1
+  'rgb(255,227,227)',//1
+  'rgb(171,134,255)',//1
+  'rgb(255,179,228)',//1
+  'rgb(255,150,150)',//1
+  'rgb(255,163,125)',//1
+  'rgb(255,255,117)',//1
+  'rgb(171,255,104)',//1
+  'rgb(0,194,255)',//1
+  'rgb(254,255,255)',//1
+  'rgb(91,91,118)',//1
+  'rgb(187,103,122)',//2
+  'rgb(255,202,184)',//2
+  'rgb(137,107,214)',//2
+  'rgb(255,144,202)',//2
+  'rgb(255,72,101)',//2
+  'rgb(255,108,80)',//2
+  'rgb(255,205,0)',//2
+  'rgb(62,186,73)',//2
+  'rgb(0,140,255)',//2
+  'rgb(221,224,240)',//2
+  'rgb(60,60,80)',//2
+  'rgb(144,79,90)',//3
+  'rgb(245,171,160)',//3
+  'rgb(102,81,158)',//3
+  'rgb(230,108,167)',//3
+  'rgb(187,52,77)',//3
+  'rgb(200,77,61)',//3
+  'rgb(233,163,0)',//3
+  'rgb(0,134,74)',//3
+  'rgb(0,106,212)',//3
+  'rgb(135,139,160)',//3
+  'rgb(26,26,37)'//3
+];
+
+//sort
+for (let x = 0; x < 11; x++) {
+  for (let y = 0; y < 3; y++) {
+    var i = y*11 + x;
+    palette[x*3+y] = colors[i];
+  }
+}
+
+function cls(x) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.background = x;
+}
+
+res = 17;
+scale = 5;
+size = res*(scale+1);
+n = 255/size;
+n2 = 255/85;
+n3 = 360/size;
+t = 0;
+touchHue = res*(scale-1);
+hue = touchHue*(360/(res*scale));
+start = false;
+[stx,sty] = [res*scale/2,res*scale/2];
+
+[canvas.width,canvas.height] = [size,size];
+ctx.imageSmoothingEnabled = false;
+
+//setup palette
+var rgbPalette = new Image(); 
+rgbPalette.src = 'i85.txt';
+//var rgbPalette = document.querySelector('.palette');
+
+function pset(x,y,c) {
+  x = Math.round(x);
+  y = Math.round(y);
+  ctx.beginPath();
+  ctx.fillStyle = c;
+  ctx.fillRect(x,y,1,1);
+  ctx.fill();
+}
+
+function rect(x,y,sx,sy,c) {
+  x = Math.round(x)-sx/2;
+  y = Math.round(y)-sy/2;
+  sx = (sx);
+  sy = (sy);
+  ctx.strokeStyle = c;
+  ctx.strokeRect(x,y,sx,sy);
+}
+
+function pix(x,y,r,g,b,rot) {
+  r = Math.min(r,255);
+  g = Math.min(g,255);
+  b = Math.min(b,255);
+  x1 = Math.min(r/n2,85-scale);
+  y1 = Math.min(g/n2,85-scale)+Math.floor(Math.min(b/n2,85-scale))*85;
+  ctx.drawImage(rgbPalette,x1,y1,scale,scale,x*scale,y*scale,scale,scale);
+}
+
+function pixrect(x,y,r,g,b,w,h) {
+  r = Math.min(r,255);
+  g = Math.min(g,255);
+  b = Math.min(b,255);
+  x1 = Math.min(r/n2,85-scale);
+  y1 = Math.min(g/n2,85-scale)+Math.floor(Math.min(b/n2,85-scale))*85;
+  ctx.drawImage(rgbPalette,x1,y1,w/5,h/5,x*scale,y*scale,w,h);
+}
+
+function vox(x,y,w,h,x1,y1,r,angle) {
+  ctx.save();
+  ctx.translate(x+w/2,y+h/2);
+  ctx.scale(1,Math.sin(angle*(Math.PI/180)));
+  ctx.rotate(r * (Math.PI/180));
+  ctx.translate(-x-w/2,-y-h/2);
+  ctx.drawImage(rgbPalette,x1,y1,85,85,x,y,w,h);
+  ctx.restore();
+}
+
+function rotation(x1,y1,x,y,a) {
+  var radians = (Math.PI / 180) * a;
+  cos = Math.cos(radians);
+  sin = Math.sin(radians);
+  nx = (cos * (x - x1)) + (sin * (y - y1)) + x1;
+  ny = (cos * (y - y1)) - (sin * (x - x1)) + y1;
+  return [nx, ny];
+}
+
+const HSLtoRGB = (h, s, l) => {
+  s /= 100;
+  l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n =>
+    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [255 * f(0), 255 * f(8), 255 * f(4)];
+};
+
+const el = document.querySelector('#canvas');
+el.addEventListener('touchstart', touch);
+el.addEventListener('touchmove',touch);
+el.addEventListener('mousedown', mouseDown);
+el.addEventListener('mousemove', mouseMove);
+el.addEventListener('mouseup', mouseUp);
+
+function resize() {
+  bb = canvas.getBoundingClientRect();
+}
+window.addEventListener('resize', resize);
+resize();
+
+function touch() {
+  tx = (event.touches[0].clientX-bb.left)/bb.width*canvas.width;
+  ty = (event.touches[0].clientY-bb.top)/bb.height*canvas.height;
+  if (tx>res*scale) {
+    touchHue = Math.max(Math.min(ty,res*scale),0);
+    hue = touchHue*(360/(res*scale));
+  }
+  else {
+    if (ty<res*scale) {
+      stx = Math.min(Math.max(tx,0),85);
+      sty = Math.min(Math.max(ty,0),85);
+    }
+  }
+}
+
+function mouseDown() {
+  start = true;
+}
+
+function mouseMove() {
+  tx = (event.clientX-bb.left)/bb.width*canvas.width;
+  ty = (event.clientY-bb.top)/bb.height*canvas.height;
+  if (start == true) {
+    if (tx>res*scale) {
+      touchHue = Math.max(Math.min(ty,res*scale),0);
+      hue = touchHue*(360/(res*scale));
+    }
+    else {
+      if (ty<res*scale) {
+        stx = Math.min(Math.max(tx,0),85);
+        sty = Math.min(Math.max(ty,0),85);
+      }
+    }
+  }
+}
+
+function mouseUp() {
+  start = false;
+}
+
+function draw() {
+  requestAnimationFrame(draw);
+  cls('rgb(26,26,37)');
+  t++;
+  for (x = 0; x < res; x++) {
+    [r,g,b] = HSLtoRGB(x*(360/res),100,50);
+    pset(res,x+res*scale,'rgb('+r+','+g+','+b+')');
+    pixrect(res,x,r,g,b,res,scale);
+    for (y = 0; y < res; y++) {
+      [r,g,b] = HSLtoRGB(touchHue*(360/(res*scale)),x*(100/res),y*(100/res));
+      sy = y*-1+res-1;
+      pix(x,sy,r,g,b);
+      pset(x,sy+res*scale,'rgb('+r+','+g+','+b+')');
+    }
+  }
+  [i,j,k] = HSLtoRGB(hue,Math.round(stx*(100/(res*scale))-scale),Math.round((sty*-1+res*scale-scale)*(100/(res*scale))));
+  pixrect(res/(scale-.25),res,i,j,k,res,res);
+  [i,j,k] = HSLtoRGB(hue+180,Math.round(stx*(100/(res*scale))-scale),Math.round((sty*-1+res*scale-scale)*(100/(res*scale))));
+  pixrect(res/(scale-.25)+(res/scale),res,i,j,k,res,res);
+  rect(res*(scale+.5),touchHue,res+2,5,'#fff');
+  rect(res,Math.min(Math.max((res*scale)+hue*(res/360),res*scale),res*(scale+1)),3,3,'#fff');
+  rect(stx,sty,scale,scale,'#fff');
+  rect(stx/scale,(res*scale)+sty/scale,3,3,'#fff');
+  x = res*(scale-.75);
+  y = res*4.925;
+  rotx = -30+180;
+  for (d = 0; d < 85; d++) {
+    [zv,yv] = rotation(0,85/17,0,d/8.5,rotx)
+    vox(x,yv+y,res/1.75,res/1.75,0,d*85,t*5,rotx);
+  }
+}
+
+draw();
+
+</script>
+</body>
+
+</html>
